@@ -1,0 +1,15 @@
+src/
+├── interfaces/
+│   ├── IDAOGovernance.sol
+│   ├── IDisasterRelief.sol
+        IDisasterReliefFactory.sol
+│   ├── IFundEscrow.sol
+│   └── INFTBadge.sol
+├── contracts/
+│   ├── DAOGovernance.sol
+│   ├── DisasterRelief.sol
+│   ├── DisasterReliefFactory.sol
+│   ├── FundEscrow.sol
+│   └── NFTBadge.sol
+├── libraries/
+│   └── ZKVerification.sol
