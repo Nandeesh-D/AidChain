@@ -12,6 +12,8 @@ interface IDisasterReliefFactory {
         uint256 distributionPeriod,
         uint256 initialFunds
     ) external returns (address);
+
+    function isDisasterRelief(address disasterReliefAddress) external view returns (bool);
     
-    function getDeployedContracts() external view returns (address[] memory);
+    
 }

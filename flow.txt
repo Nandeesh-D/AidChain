@@ -13,3 +13,21 @@ src/
 │   └── NFTBadge.sol
 ├── libraries/
 │   └── ZKVerification.sol
+
+
+ 
+
+Notes:
+
+Have to set image uri for nfts using ipfs
+
+
+deployment requirements:
+
+1. DAOGovernance require 'admin address'
+        next admin have to set factory and escrow address
+
+
+mockusdc: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+
+DAOGovernance and DisasterReliefFactory should be deployed by the same admin

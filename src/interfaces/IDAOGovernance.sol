@@ -15,19 +15,21 @@ interface IDAOGovernance {
         uint256 endTime;
         uint256 forVotes;
         uint256 againstVotes;
+        string image;  //campaign specific image
         ProposalState state;
     }
 
-    event ProposalCreated(uint256 proposalId, string disasterName, string area, uint256 duration, uint256 fundAmount);
-    event Voted(uint256 proposalId, address voter, bool support);
-    event ProposalExecuted(uint256 proposalId, address disasterReliefAddress);
 
+    event ProposalCreated(uint256 indexed proposalId, string disasterName, string area, uint256 duration, uint256 fundAmount);
+    event Voted(uint256 indexed proposalId, address voter, bool support);
+    event ProposalExecuted(uint256 indexed proposalId, address disasterReliefAddress);
     
     function createProposal(
         string memory disasterName,
         string memory area,
         uint256 duration,
-        uint256 fundsRequested
+        uint256 fundsRequested,
+        string memory image
     ) external returns (uint256);
     
     function vote(uint256 proposalId, bool support) external;
@@ -38,14 +40,19 @@ interface IDAOGovernance {
 
     //added extra
     function setDisasterReliefFactory(address factory) external ;
+
+    function setFundEscrow(address fundEscrowAddress) external;
+
+    function fundEscrow1() external view returns (address);
     
     function addDAOMember(address _member) external;
     
     function removeDAOMember(address _member) external;
 
+
+    function isAdmin(address _admin) external view returns (bool);
+    function isDAOMember(address _member) external view returns (bool);
     function proposalCount() external view returns (uint256);
 
-    function memberCount() external view returns (uint256);
-
-    function requiredVotingPercentage() external view returns (uint256);
+    function memberCount() external view returns (uint256);  
 }

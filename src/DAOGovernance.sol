@@ -3,26 +3,27 @@ pragma solidity ^0.8.20;
 
 import {IDAOGovernance} from "./interfaces/IDAOGovernance.sol";
 import{IDisasterReliefFactory} from "./interfaces/IDisasterReliefFactory.sol";
-
+import{IFundEscrow} from "./interfaces/IFundEscrow.sol";
 
 contract DAOGovernance is IDAOGovernance {
-    // Roles and access control
+
     mapping(address => bool) public isAdmin;
     mapping(address => bool) public isDAOMember;
-    uint256 public totalMembers;
+    uint256 public totalMembers; //totalMembers in the DAO
     
-    // Proposal tracking
+    
     uint256 private _nextProposalId;
-    mapping(uint256 => Proposal) private _proposals;
-    mapping(uint256 => mapping(address => bool)) private _hasVoted;
+    mapping(uint256 => Proposal) private _proposals; //mapping from proposalId to Proposal details
+    mapping(uint256 => mapping(address => bool)) private _hasVoted;  
     
-    // Governance parameters
+    // governance parameters
     uint256 public votingPeriod = 2 days;
-    uint256 public quorumPercentage = 60; // 60% of votes needed to pass
+
     
     IDisasterReliefFactory public disasterReliefFactory;
+    IFundEscrow public fundEscrow;
     
-    // Modifiers
+    // modifiers
     modifier onlyAdmin() {
         require(isAdmin[msg.sender], "Not an admin");
         _;
@@ -34,6 +35,7 @@ contract DAOGovernance is IDAOGovernance {
     }
     
     constructor(address admin) {
+        require(admin != address(0), "Admin address cannot be zero");   
         isAdmin[admin] = true;
         isDAOMember[admin] = true;
         totalMembers = 1;
@@ -43,6 +45,12 @@ contract DAOGovernance is IDAOGovernance {
         //only one time factory set
         if(address(disasterReliefFactory)==address(0)){
                 disasterReliefFactory = IDisasterReliefFactory(factory);
+        }    
+    }
+
+    function setFundEscrow(address fundEscrowAddress) external onlyAdmin {
+        if(address(fundEscrowAddress)==address(0)){
+                fundEscrow = IFundEscrow(fundEscrowAddress);
         }    
     }
     
@@ -64,7 +72,8 @@ contract DAOGovernance is IDAOGovernance {
         string memory disasterName, 
         string memory area, 
         uint256 duration, 
-        uint256 fundAmount
+        uint256 fundAmount,
+        string memory image
     ) external onlyDAOMember override returns (uint256) {
         uint256 proposalId = ++_nextProposalId;
         
@@ -79,6 +88,7 @@ contract DAOGovernance is IDAOGovernance {
             againstVotes: 0,
             startTime: block.timestamp,
             endTime: block.timestamp + votingPeriod,
+            image:image,
             state: ProposalState.Active
         });
         
@@ -107,11 +117,9 @@ contract DAOGovernance is IDAOGovernance {
         emit Voted(proposalId, msg.sender, support);
     }
     
-    function executeProposal(uint256 proposalId) internal {
+    function executeProposal(uint256 proposalId) internal{
         Proposal storage proposal = _proposals[proposalId];
         require(proposal.state == ProposalState.Active, "Proposal does not exist");
-        require(block.timestamp > proposal.endTime, "Voting period not ended");
-        require(isProposalPassed(proposalId), "Proposal did not pass");
         
         proposal.state = ProposalState.Passed;
         
@@ -125,29 +133,43 @@ contract DAOGovernance is IDAOGovernance {
             7 days, // distribution period
             proposal.fundsRequested
         );
+        uint256 escrowBalance= fundEscrow.getBalance();
+        require(escrowBalance >= proposal.fundsRequested, "Insufficient funds in escrow");
+
+        //add initial funds to the contract
+        //fundEscrow.allocateFunds(disasterReliefAddress, proposal.fundsRequested);
         
         emit ProposalExecuted(proposalId, disasterReliefAddress);
     }
-    
+
+
     function isProposalPassed(uint256 proposalId) internal view returns (bool) {
         
         Proposal memory proposal = _proposals[proposalId];
         require(proposal.state == ProposalState.Active, "Proposal is Not Active");
-        
-        // Calculate participation and approval
-        uint256 totalVotes = proposal.forVotes + proposal.againstVotes;
-        uint256 participationRate = (totalVotes * 100) / totalMembers;
-        
-        // Check if quorum reached and majority voted in favor
-        return participationRate >= quorumPercentage && proposal.forVotes > proposal.againstVotes;
+        // check the for Vote count is satisfied
+        if(proposal.forVotes >= calculateRequiredVotes()){
+            return true;
+        }else if(proposal.againstVotes >= calculateRequiredVotes()){  //check for proposal rejection
+            proposal.state= ProposalState.Rejected;
+            return false;
+        }
+        return false;
     }
+
+    function calculateRequiredVotes() internal view returns (uint256 votes) {
+        return (60 * totalMembers + 99) / 100;
+    }
+
 
     function hasVoted(uint256 proposalId, address voter) external view returns (bool){
         return _hasVoted[proposalId][voter];
     }
     
     function getProposal(uint256 proposalId) external view override returns (Proposal memory) {
-        require(_proposals[proposalId].id == 0, "Proposal does not exist");
+        if(_proposals[proposalId].id == 0){
+            revert("Proposal Doesn't exist");
+        }
         return _proposals[proposalId];
     }
 
@@ -159,7 +181,11 @@ contract DAOGovernance is IDAOGovernance {
         return totalMembers;
     }
 
-    function requiredVotingPercentage() external view returns (uint256){
-        return quorumPercentage;
+    function getProposalStatus(uint256 proposalId) external view returns(ProposalState){
+        return _proposals[proposalId].state;
+    }
+
+    function fundEscrow1() external view override returns (address){
+        return address(fundEscrow);
     }
 }
