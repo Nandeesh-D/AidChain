@@ -49,7 +49,7 @@ contract DAOGovernance is IDAOGovernance {
     }
 
     function setFundEscrow(address fundEscrowAddress) external onlyAdmin {
-        if(address(fundEscrowAddress)==address(0)){
+        if(address(fundEscrow)==address(0)){
                 fundEscrow = IFundEscrow(fundEscrowAddress);
         }    
     }
@@ -185,7 +185,4 @@ contract DAOGovernance is IDAOGovernance {
         return _proposals[proposalId].state;
     }
 
-    function fundEscrow1() external view override returns (address){
-        return address(fundEscrow);
-    }
 }

@@ -10,7 +10,7 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 contract FundEscrow is IFundEscrow {
     using SafeERC20 for IERC20;
     
-    address public constant USDC = 0x036CbD53842c5426634e7929541eC2318f3dCF7e;
+    address public  USDC;
     
     IDisasterReliefFactory public factory;
     GeneralDonorBadge public donorBadge;
@@ -24,7 +24,7 @@ contract FundEscrow is IFundEscrow {
         _;
     }
     
-    constructor(address _factory, address _donorBadge, address _daoGovernance) {
+    constructor(address _factory, address _donorBadge, address _daoGovernance,address _usdc) {
         require(_factory != address(0), "Invalid factory address");
         require(_donorBadge != address(0), "Invalid donor badge address");
         require(_daoGovernance != address(0), "Invalid DAO governance address");
@@ -32,6 +32,9 @@ contract FundEscrow is IFundEscrow {
         factory = IDisasterReliefFactory(_factory);
         donorBadge = GeneralDonorBadge(_donorBadge);
         daoGovernance = _daoGovernance;
+        USDC=_usdc;
+        //approving the governance contract to spend USDC
+        IERC20(USDC).approve(_daoGovernance, type(uint256).max);
     }
     
     function donate(uint256 amount) external override {
@@ -47,6 +50,8 @@ contract FundEscrow is IFundEscrow {
             
         emit FundsDeposited(msg.sender, amount);
     }
+
+    
     
     // function withdraw(uint256 amount) external override onlyDAO {
     //     require(amount <= getBalance(), "Insufficient funds");

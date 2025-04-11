@@ -7,6 +7,7 @@ import{DisasterReliefFactory,IDisasterReliefFactory} from "../src/DisasterRelief
 import{DisasterDonorBadge,INFTBadge} from "../src/DisasterDonorBadge.sol";
 import{GeneralDonorBadge,INFTBadge} from "../src/GeneralDonorBadge.sol";
 import{FundEscrow,IFundEscrow} from "../src/FundEscrow.sol";
+import{MockUSDC} from "../test/MockUSDC.sol";
 contract DAOGovernanceDeployer is Script{
     function run() external returns(address daoGovernance,address disasterReliefFactory,address fundEscrow){
         vm.startBroadcast();
@@ -24,8 +25,13 @@ contract DAOGovernanceDeployer is Script{
         //deploy donation badge
         INFTBadge _disasterDonorBadge = new DisasterDonorBadge();
         console.log("DisasterDonorBadge address",address(_disasterDonorBadge));
+
+        //deploy mock usdc
+        MockUSDC _mockUSDC = new MockUSDC();
         //deploy fund escrow
-        IFundEscrow _fundEscrow = new FundEscrow(address(_daoGovernance),address(_disasterDonorBadge),address(_generalDonorBadge));
+        
+        IFundEscrow _fundEscrow = new FundEscrow(address(_disasterReliefFactory),address(_generalDonorBadge),address(_daoGovernance),address(_mockUSDC));
+        
         console.log("FundEscrow address",address(_fundEscrow));
         
         vm.stopBroadcast();

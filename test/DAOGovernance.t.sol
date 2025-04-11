@@ -5,6 +5,8 @@ import{Test,console} from "forge-std/Test.sol";
 import{MockUSDC} from "../test/MockUSDC.sol";
 import{DAOGovernance,IDAOGovernance} from "../src/DAOGovernance.sol";
 import{DAOGovernanceDeployer} from "../script/DAOGovernance.s.sol";
+import{DeployMockUSDC} from "../script/MockUSDC.s.sol";
+import{IFundEscrow} from "../src/FundEscrow.sol";
 contract DAOConstanst is Test{
     address admin=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266; //anvil default address
         //dao members
@@ -14,18 +16,27 @@ contract DAOConstanst is Test{
     address member4=address(4);
     address member5=address(5);
 
-    address mockUsdc=0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512;
+    address mockUsdc;
     IDAOGovernance daoGovernance;
     function setUp() public{
         vm.prank(admin);
         DAOGovernanceDeployer daoGovernanceDeployer=new DAOGovernanceDeployer();
         (address _daoGovernance,address _disasterReliefFactory,address _fundEscrow)=daoGovernanceDeployer.run();
+
+        DeployMockUSDC deployerMockUSDC=new DeployMockUSDC();
+        mockUsdc=deployerMockUSDC.run();
+        console.log("Mock USDC address",mockUsdc);
+
         daoGovernance=IDAOGovernance(_daoGovernance);
         vm.prank(admin);
-        daoGovernance.setDisasterReliefFactory(address(_disasterReliefFactory));
+        daoGovernance.setDisasterReliefFactory(_disasterReliefFactory);
+        
         vm.prank(admin);
-        daoGovernance.setFundEscrow(address(_fundEscrow));
-       
+        daoGovernance.setFundEscrow(_fundEscrow);
+
+        vm.prank(admin);
+        MockUSDC(mockUsdc).mint(_fundEscrow,1000000000000);
+        console.log("Mock USDC balance of fundEscrow",MockUSDC(mockUsdc).balanceOf(_fundEscrow));         
     }
 
     modifier MembersAdded(){
@@ -95,7 +106,7 @@ contract DAOConstanst is Test{
         daoGovernance.vote(1,true);
         assert(daoGovernance.getProposal(1).forVotes==4); 
         console.log("passed");
-        console.log("daoGov fundEscrow",daoGovernance.fundEscrow1());
+        //console.log("daoGov fundEscrow",daoGovernance.fundEscrow1());
         assert(daoGovernance.getProposal(1).state==IDAOGovernance.ProposalState.Passed);
         console.log("passed");
     }

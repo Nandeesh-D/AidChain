@@ -42,8 +42,6 @@ interface IDAOGovernance {
     function setDisasterReliefFactory(address factory) external ;
 
     function setFundEscrow(address fundEscrowAddress) external;
-
-    function fundEscrow1() external view returns (address);
     
     function addDAOMember(address _member) external;
     
