@@ -20,6 +20,7 @@ contract DisasterReliefFactory is IDisasterReliefFactory {
     DisasterDonorBadge public donorBadge;
     
     mapping(address => bool) public isDisasterRelief;
+    address[] public disasterReliefContracts;
     
     modifier onlyOwner() {
         require(msg.sender == owner, "Not owner");
@@ -55,18 +56,27 @@ contract DisasterReliefFactory is IDisasterReliefFactory {
             distributionPeriod,
             initialFunds,
             address(donorBadge),
-            zkVerifier
+            zkVerifier,
+            USDC
         );
         
         isDisasterRelief[address(newRelief)] = true;
-        
+        disasterReliefContracts.push(address(newRelief));
         emit DisasterReliefDeployed(address(newRelief), disasterName, initialFunds);
         return address(newRelief);
     }
+
     function setDAOGovernance(address _daoGov) external onlyOwner {
         daoGov = IDAOGovernance(_daoGov);
     }
+
+    function getProposal(uint256 _index) external view returns(address){
+        return disasterReliefContracts[_index];
+    }
     
+    function getAllProposals() external view returns(address[] memory){
+        return disasterReliefContracts;
+    }
     function setZKVerifier(address _zkVerifier) external onlyOwner {
         zkVerifier = _zkVerifier;
     }

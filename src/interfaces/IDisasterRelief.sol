@@ -36,7 +36,7 @@
 pragma solidity ^0.8.20;
 
 interface IDisasterRelief {
-    enum ContractState { Donation, Registration, Distribution, Closed }
+    enum ContractState { Donation, Registration,Waiting, Distribution, Closed }
     
     event DonationReceived(address indexed donor, uint256 amount);
     event VictimRegistered(address indexed victim);

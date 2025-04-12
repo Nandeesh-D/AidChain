@@ -24,12 +24,12 @@ contract DisasterDonorBadge is ERC721, INFTBadge {
         owner = msg.sender;
     }
 
-    function setDisasterContract(address disasterReliefFactory) external onlyOwner{
+    function setAllowedContract(address disasterReliefFactory) external onlyOwner{
          _distasterReliefFacotry=DisasterReliefFactory(disasterReliefFactory);
     }
     
     function mint(address to) external override onlyReliefContract returns (uint256) {
-        require(msg.sender == owner, "Not authorized");
+        require(_distasterReliefFacotry.isDisasterRelief(msg.sender), "Not authorized");
         
         uint256 tokenId = ++_nextTokenId;
         _safeMint(to, tokenId);

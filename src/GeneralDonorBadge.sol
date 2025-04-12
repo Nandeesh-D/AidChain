@@ -23,7 +23,7 @@ contract GeneralDonorBadge is ERC721, INFTBadge {
         owner = msg.sender;
     }
     
-    function setAllowedAddressToMintNFT(address _escrowContract) external onlyOwner {
+    function setAllowedContract(address _escrowContract) external onlyOwner {
         require(_escrowContract != address(0), "Invalid escrow address");
         escrowContract = _escrowContract;
     }
