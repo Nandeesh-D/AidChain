@@ -11,13 +11,11 @@ import{MockUSDC} from "../test/MockUSDC.sol";
 contract DAOGovernanceDeployer is Script{
     function run() external returns(address daoGovernance,address disasterReliefFactory,address fundEscrow){
         vm.startBroadcast();
-        address admin=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266; //anvil default address
-        IDAOGovernance _daoGovernance = new DAOGovernance(admin);
-        console.log("DAOGovernance address",address(_daoGovernance));
-        console.log("DAO admin addess",_daoGovernance.isAdmin(admin));
-        IDisasterReliefFactory _disasterReliefFactory = new DisasterReliefFactory(address(_daoGovernance),0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512);
-        console.log("DisasterReliefFactory address",address(_disasterReliefFactory));
-        
+        //deploy mock usdc
+        MockUSDC _mockUSDC = new MockUSDC();
+        console.log("Mock USDC address",address(_mockUSDC));
+
+
         //deploy general badge
         INFTBadge _generalDonorBadge = new GeneralDonorBadge();
         console.log("GeneralDonorBadge address",address(_generalDonorBadge));
@@ -26,13 +24,24 @@ contract DAOGovernanceDeployer is Script{
         INFTBadge _disasterDonorBadge = new DisasterDonorBadge();
         console.log("DisasterDonorBadge address",address(_disasterDonorBadge));
 
-        //deploy mock usdc
-        MockUSDC _mockUSDC = new MockUSDC();
+        address admin=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266; //anvil default address
+        IDAOGovernance _daoGovernance = new DAOGovernance(admin);
+        console.log("DAOGovernance address",address(_daoGovernance));
+        console.log("DAO admin addess",_daoGovernance.isAdmin(admin));
+        IDisasterReliefFactory _disasterReliefFactory = new DisasterReliefFactory(address(_daoGovernance),0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512,address(_mockUSDC),address(_disasterDonorBadge));
+        console.log("DisasterReliefFactory address",address(_disasterReliefFactory));
+        
+        
+
+        
         //deploy fund escrow
         
         IFundEscrow _fundEscrow = new FundEscrow(address(_disasterReliefFactory),address(_generalDonorBadge),address(_daoGovernance),address(_mockUSDC));
         
         console.log("FundEscrow address",address(_fundEscrow));
+
+        GeneralDonorBadge(address(_generalDonorBadge)).setAllowedAddressToMintNFT(address(_fundEscrow));
+        console.log("Escrow contract set in GeneralDonorBadge");
         
         vm.stopBroadcast();
         return (address(_daoGovernance),address(_disasterReliefFactory),address(_fundEscrow));

@@ -10,7 +10,7 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 contract FundEscrow is IFundEscrow {
     using SafeERC20 for IERC20;
     
-    address public  USDC;
+    address public USDC;
     
     IDisasterReliefFactory public factory;
     GeneralDonorBadge public donorBadge;
@@ -51,14 +51,6 @@ contract FundEscrow is IFundEscrow {
         emit FundsDeposited(msg.sender, amount);
     }
 
-    
-    
-    // function withdraw(uint256 amount) external override onlyDAO {
-    //     require(amount <= getBalance(), "Insufficient funds");
-        
-    //     IERC20(USDC).safeTransfer(daoGovernance, amount);
-    //     emit FundsWithdrawn(daoGovernance, amount);
-    // }
     
     function allocateFunds(address reliefContract, uint256 amount) external override onlyDAO {
         require(factory.isDisasterRelief(reliefContract), "Invalid relief contract");

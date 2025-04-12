@@ -12,11 +12,12 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 contract DisasterReliefFactory is IDisasterReliefFactory {
     using SafeERC20 for IERC20;
     
-    address public constant USDC = 0x036CbD53842c5426634e7929541eC2318f3dCF7e;
+    address public immutable USDC;
     
     IDAOGovernance public daoGov;
     address public zkVerifier;
     address public owner;
+    DisasterDonorBadge public donorBadge;
     
     mapping(address => bool) public isDisasterRelief;
     
@@ -25,10 +26,12 @@ contract DisasterReliefFactory is IDisasterReliefFactory {
         _;
     }
     
-    constructor(address _daoGov, address _zkVerifier) {
+    constructor(address _daoGov, address _zkVerifier,address _usdc,address _donorBadge) {
         owner = msg.sender;
         daoGov= IDAOGovernance(_daoGov);
         zkVerifier = _zkVerifier;
+        USDC=_usdc;
+        donorBadge=DisasterDonorBadge(_donorBadge);
     }
     
     function deployDisasterRelief(
@@ -42,7 +45,7 @@ contract DisasterReliefFactory is IDisasterReliefFactory {
     ) external override returns (address) {
         require(msg.sender == address(daoGov), "Only fund escrow can deploy");
         
-        DisasterDonorBadge donorBadge = new DisasterDonorBadge();
+        
         DisasterRelief newRelief = new DisasterRelief(
             disasterName,
             area,
