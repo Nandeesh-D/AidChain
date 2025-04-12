@@ -1,5 +1,3 @@
-
-
 // interface IDisasterRelief {
 //     struct Victim {
 //         address payable walletAddress;
@@ -31,18 +29,23 @@
 //     );
 // }
 
-
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
 interface IDisasterRelief {
-    enum ContractState { Donation, Registration,Waiting, Distribution, Closed }
-    
+    enum ContractState {
+        Donation,
+        Registration,
+        Waiting,
+        Distribution,
+        Closed
+    }
+
     event DonationReceived(address indexed donor, uint256 amount);
     event VictimRegistered(address indexed victim);
     event FundsDistributed(address indexed victim, uint256 amount);
     event StateChanged(ContractState newState);
-    
+
     function donate(uint256 amount) external;
     function registerAsVictim(bytes calldata zkProof) external;
     function withdrawFunds() external;

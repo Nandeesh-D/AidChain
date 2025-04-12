@@ -2,8 +2,12 @@
 pragma solidity ^0.8.0;
 
 interface IDAOGovernance {
-    enum ProposalState {  Active, Passed, Rejected }
-    
+    enum ProposalState {
+        Active,
+        Passed,
+        Rejected
+    }
+
     struct Proposal {
         uint256 id;
         address proposer;
@@ -15,15 +19,16 @@ interface IDAOGovernance {
         uint256 endTime;
         uint256 forVotes;
         uint256 againstVotes;
-        string image;  //campaign specific image
+        string image; //campaign specific image
         ProposalState state;
     }
 
-
-    event ProposalCreated(uint256 indexed proposalId, string disasterName, string area, uint256 duration, uint256 fundAmount);
+    event ProposalCreated(
+        uint256 indexed proposalId, string disasterName, string area, uint256 duration, uint256 fundAmount
+    );
     event Voted(uint256 indexed proposalId, address voter, bool support);
     event ProposalExecuted(uint256 indexed proposalId, address disasterReliefAddress);
-    
+
     function createProposal(
         string memory disasterName,
         string memory area,
@@ -31,26 +36,25 @@ interface IDAOGovernance {
         uint256 fundsRequested,
         string memory image
     ) external returns (uint256);
-    
+
     function vote(uint256 proposalId, bool support) external;
-    
+
     function getProposal(uint256 proposalId) external view returns (Proposal memory);
-    
+
     function hasVoted(uint256 proposalId, address voter) external view returns (bool);
 
     //added extra
-    function setDisasterReliefFactory(address factory) external ;
+    function setDisasterReliefFactory(address factory) external;
 
     function setFundEscrow(address fundEscrowAddress) external;
-    
-    function addDAOMember(address _member) external;
-    
-    function removeDAOMember(address _member) external;
 
+    function addDAOMember(address _member) external;
+
+    function removeDAOMember(address _member) external;
 
     function isAdmin(address _admin) external view returns (bool);
     function isDAOMember(address _member) external view returns (bool);
     function proposalCount() external view returns (uint256);
 
-    function memberCount() external view returns (uint256);  
+    function memberCount() external view returns (uint256);
 }

@@ -27,33 +27,33 @@
 //     vm.prank(admin);
 //     DAOGovernanceDeployer daoGovernanceDeployer = new DAOGovernanceDeployer();
 //     (address _daoGovernance, address _disasterReliefFactory, address _fundEscrow) = daoGovernanceDeployer.run();
-    
+
 //     // Get the MockUSDC address used by the FundEscrow contract
 //     mockUsdc = FundEscrow(_fundEscrow).USDC();
 //     console.log("Mock USDC address:", mockUsdc);
-    
+
 //     daoGovernance = IDAOGovernance(_daoGovernance);
 //     fundEscrow = IFundEscrow(_fundEscrow);
-    
+
 //     // Set factory and escrow in governance
 //     vm.prank(admin);
 //     daoGovernance.setDisasterReliefFactory(_disasterReliefFactory);
 //     vm.prank(admin);
 //     daoGovernance.setFundEscrow(_fundEscrow);
-    
+
 //     // Mint USDC to member1 using the correct MockUSDC contract
 //     vm.prank(admin);
 //     MockUSDC(mockUsdc).mint(member1, 100000000e6);
 //     console.log("Mock USDC balance of member1:", MockUSDC(mockUsdc).balanceOf(member1));
-    
+
 //     // Approve and donate to fundEscrow
 //     vm.prank(member1);
 //     MockUSDC(mockUsdc).approve(_fundEscrow, 10000e6);
 //     console.log("Mock USDC approved to fundEscrow");
-    
+
 //     uint256 allow = MockUSDC(mockUsdc).allowance(member1, _fundEscrow);
 //     console.log("approval tokens", allow);
-    
+
 //     vm.prank(member1);
 //     IFundEscrow(_fundEscrow).donate(10000e6);
 //     console.log("Mock USDC balance of member1 after donation:", MockUSDC(mockUsdc).balanceOf(member1));
@@ -142,7 +142,6 @@
 //         assert(daoGovernance.getProposal(1).state == IDAOGovernance.ProposalState.Passed);
 //         console.log("Proposal passed successfully!");
 
-        
 //         vm.prank(member1);
 //         MockUSDC(mockUsdc).approve(0x6187F206E5b64D97E5136B5779683a923EaEB1B4, 10000e6);
 //         vm.prank(member1);
@@ -151,5 +150,4 @@
 //         assert(IERC721(0xBb2180ebd78ce97360503434eD37fcf4a1Df61c3).ownerOf(1)==member1);
 //     }
 
-    
 // }

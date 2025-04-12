@@ -15,7 +15,6 @@
 //         MockUSDC _mockUSDC = new MockUSDC();
 //         console.log("Mock USDC address",address(_mockUSDC));
 
-
 //         //deploy general badge
 //         INFTBadge _generalDonorBadge = new GeneralDonorBadge();
 //         console.log("GeneralDonorBadge address",address(_generalDonorBadge));
@@ -30,19 +29,16 @@
 //         console.log("DAO admin addess",_daoGovernance.isAdmin(admin));
 //         IDisasterReliefFactory _disasterReliefFactory = new DisasterReliefFactory(address(_daoGovernance),0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512,address(_mockUSDC),address(_disasterDonorBadge));
 //         console.log("DisasterReliefFactory address",address(_disasterReliefFactory));
-        
-        
 
-        
 //         //deploy fund escrow
-        
+
 //         IFundEscrow _fundEscrow = new FundEscrow(address(_disasterReliefFactory),address(_generalDonorBadge),address(_daoGovernance),address(_mockUSDC));
-        
+
 //         console.log("FundEscrow address",address(_fundEscrow));
 
 //         GeneralDonorBadge(address(_generalDonorBadge)).setAllowedAddressToMintNFT(address(_fundEscrow));
 //         console.log("Escrow contract set in GeneralDonorBadge");
-        
+
 //         vm.stopBroadcast();
 //         return (address(_daoGovernance),address(_disasterReliefFactory),address(_fundEscrow));
 //     }

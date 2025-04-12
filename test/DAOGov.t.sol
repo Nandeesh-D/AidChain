@@ -6,12 +6,11 @@ import {MockUSDC} from "../test/MockUSDC.sol";
 import {DAOGovernance, IDAOGovernance} from "../src/DAOGovernance.sol";
 import {FundEscrow, IFundEscrow} from "../src/FundEscrow.sol";
 import {DisasterReliefFactory, IDisasterReliefFactory} from "../src/DisasterReliefFactory.sol";
-import{DisasterRelief,IDisasterRelief} from "../src/DisasterRelief.sol";
+import {DisasterRelief, IDisasterRelief} from "../src/DisasterRelief.sol";
 import {DisasterDonorBadge, INFTBadge} from "../src/DisasterDonorBadge.sol";
 import {GeneralDonorBadge, INFTBadge} from "../src/GeneralDonorBadge.sol";
 
-
-contract DAOGovTest is Test{
+contract DAOGovTest is Test {
     // Create new instances of these contracts in setUp instead of using addresses
     MockUSDC public usdc;
     GeneralDonorBadge public generalBadge;
@@ -30,20 +29,18 @@ contract DAOGovTest is Test{
     address member4 = makeAddr("member4");
     address member5 = makeAddr("member5");
 
-
     function setUp() public {
         vm.startPrank(admin);
         // Deploy MockUSDC
         usdc = new MockUSDC();
 
-        
         // Deploy badge contracts
         generalBadge = new GeneralDonorBadge();
         disasterBadge = new DisasterDonorBadge();
         vm.stopPrank();
         // Deploy Governance contract
         daoGovernance = new DAOGovernance(admin);
-        
+
         // Deploy disaster relief factory
         disasterReliefFactory = new DisasterReliefFactory(
             address(daoGovernance),
@@ -53,18 +50,14 @@ contract DAOGovTest is Test{
         );
 
         // Deploy fundEscrow
-        fundEscrow = new FundEscrow(
-            address(disasterReliefFactory),
-            address(generalBadge),
-            address(daoGovernance),
-            address(usdc)
-        );
+        fundEscrow =
+            new FundEscrow(address(disasterReliefFactory), address(generalBadge), address(daoGovernance), address(usdc));
 
         vm.startPrank(admin);
         // Set factory and escrow in governance
         daoGovernance.setDisasterReliefFactory(address(disasterReliefFactory));
         daoGovernance.setFundEscrow(address(fundEscrow));
-        
+
         generalBadge.setAllowedContract(address(fundEscrow));
         disasterBadge.setAllowedContract(address(disasterReliefFactory));
         vm.stopPrank();
@@ -73,26 +66,21 @@ contract DAOGovTest is Test{
         usdc.mint(address(fundEscrow), 100e6);
     }
 
-        modifier MembersAdded() {
-            vm.startPrank(admin);
-            daoGovernance.addDAOMember(member1);
-            daoGovernance.addDAOMember(member2);
-            daoGovernance.addDAOMember(member3);
-            daoGovernance.addDAOMember(member4);
-            daoGovernance.addDAOMember(member5);
-            vm.stopPrank();
-            _;
-        }
+    modifier MembersAdded() {
+        vm.startPrank(admin);
+        daoGovernance.addDAOMember(member1);
+        daoGovernance.addDAOMember(member2);
+        daoGovernance.addDAOMember(member3);
+        daoGovernance.addDAOMember(member4);
+        daoGovernance.addDAOMember(member5);
+        vm.stopPrank();
+        _;
+    }
 
     modifier ProposalCreated() {
         vm.startPrank(member1);
-        uint256 proposalId = daoGovernance.createProposal(
-            "Hudud Cyclone",
-            "Chennai",
-            6 * 24 * 60 * 60,
-            1000,
-            "cyclone.jpg"
-        );
+        uint256 proposalId =
+            daoGovernance.createProposal("Hudud Cyclone", "Chennai", 6 * 24 * 60 * 60, 1000, "cyclone.jpg");
         assert(proposalId == 1);
         assert(daoGovernance.getProposal(proposalId).id == 1);
         assert(daoGovernance.getProposal(proposalId).duration == 6 * 24 * 60 * 60);
@@ -102,13 +90,12 @@ contract DAOGovTest is Test{
         _;
     }
 
-
     function test_escrowHasBalance() public {
         uint256 balance = usdc.balanceOf(address(fundEscrow));
         assertEq(balance, 100e6, "FundEscrow should have 100 USDC");
     }
 
-    function test_canDonatToescrow() public{
+    function test_canDonatToescrow() public {
         vm.startPrank(member1);
         // Mint USDC to member1
         usdc.mint(member1, 100000000e6);
@@ -124,7 +111,7 @@ contract DAOGovTest is Test{
         fundEscrow.donate(10000e6);
         console.log("Mock USDC balance of member1 after donation:", usdc.balanceOf(member1));
 
-        assert(generalBadge.ownerOf(1)==member1);
+        assert(generalBadge.ownerOf(1) == member1);
     }
 
     function test_addMembers() public {
@@ -140,13 +127,8 @@ contract DAOGovTest is Test{
     function test_CreateProposal() public {
         test_addMembers();
         vm.startPrank(member1);
-        uint256 proposalId = daoGovernance.createProposal(
-            "Hudud Cyclone",
-            "Chennai",
-            6 * 24 * 60 * 60,
-            100e6,
-            "cyclone.jpg"
-        );
+        uint256 proposalId =
+            daoGovernance.createProposal("Hudud Cyclone", "Chennai", 6 * 24 * 60 * 60, 100e6, "cyclone.jpg");
         assert(proposalId == 1);
         assert(daoGovernance.getProposal(proposalId).id == 1);
         assert(daoGovernance.getProposal(proposalId).duration == 6 * 24 * 60 * 60);
@@ -180,57 +162,55 @@ contract DAOGovTest is Test{
         assert(daoGovernance.getProposal(1).forVotes == 4);
         assert(daoGovernance.getProposal(1).state == IDAOGovernance.ProposalState.Passed);
         console.log("Proposal passed successfully!");
-        
-        address proposal1=DisasterReliefFactory(address(disasterReliefFactory)).getProposal(0);
+
+        address proposal1 = DisasterReliefFactory(address(disasterReliefFactory)).getProposal(0);
         //mint 1000e6 to memeber1
         usdc.mint(member1, 1000e6);
         vm.prank(member1);
         usdc.approve(proposal1, 10000e6);
         vm.prank(member1);
         DisasterRelief(proposal1).donate(10e6);
-        assert(IDisasterRelief(proposal1).getTotalFunds()==(10e6+1000));
-        assert(disasterBadge.ownerOf(1)==member1);
+        assert(IDisasterRelief(proposal1).getTotalFunds() == (10e6 + 1000));
+        assert(disasterBadge.ownerOf(1) == member1);
     }
 
     //it reverts bcz donation period is not ended
-    function test_VictimRegistrationReverts() public{
+    function test_VictimRegistrationReverts() public {
         test_proposalPassed();
-        address proposal1=DisasterReliefFactory(address(disasterReliefFactory)).getProposal(0);
+        address proposal1 = DisasterReliefFactory(address(disasterReliefFactory)).getProposal(0);
 
-        address victim1=makeAddr("victim1");
+        address victim1 = makeAddr("victim1");
         vm.prank(victim1);
         vm.expectRevert();
         IDisasterRelief(proposal1).registerAsVictim("");
         assertFalse(DisasterRelief(proposal1).victims(victim1));
     }
 
-    function test_VictimRegistrationSuccess() public{
+    function test_VictimRegistrationSuccess() public {
         test_proposalPassed();
-        address proposal1=DisasterReliefFactory(address(disasterReliefFactory)).getProposal(0);
+        address proposal1 = DisasterReliefFactory(address(disasterReliefFactory)).getProposal(0);
         vm.warp(block.timestamp + 8 days);
-        address victim1=makeAddr("victim1");
-       // DisasterRelief(proposal1).updateState();
+        address victim1 = makeAddr("victim1");
+        // DisasterRelief(proposal1).updateState();
         vm.prank(victim1);
         IDisasterRelief(proposal1).registerAsVictim("");
         assertTrue(DisasterRelief(proposal1).victims(victim1));
     }
 
-    function test_canClaimfunds() public{
+    function test_canClaimfunds() public {
         test_proposalPassed();
-        address proposal1=DisasterReliefFactory(address(disasterReliefFactory)).getProposal(0);
+        address proposal1 = DisasterReliefFactory(address(disasterReliefFactory)).getProposal(0);
         vm.warp(block.timestamp + 8 days);
-        address victim1=makeAddr("victim1");
-       // DisasterRelief(proposal1).updateState();
+        address victim1 = makeAddr("victim1");
+        // DisasterRelief(proposal1).updateState();
         vm.prank(victim1);
         IDisasterRelief(proposal1).registerAsVictim("");
         assertTrue(DisasterRelief(proposal1).victims(victim1));
-        vm.warp(block.timestamp + 10 days+ 2 minutes); 
-        console.log("funds available %e",IDisasterRelief(proposal1).getTotalFunds());
-        console.log("funds per victim %e",DisasterRelief(proposal1).amountPerVictim());
+        vm.warp(block.timestamp + 10 days + 2 minutes);
+        console.log("funds available %e", IDisasterRelief(proposal1).getTotalFunds());
+        console.log("funds per victim %e", DisasterRelief(proposal1).amountPerVictim());
         vm.prank(victim1);
         IDisasterRelief(proposal1).withdrawFunds();
         assertTrue(DisasterRelief(proposal1).hasWithdrawn(victim1));
     }
-
-
 }
