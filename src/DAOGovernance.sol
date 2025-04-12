@@ -123,17 +123,17 @@ contract DAOGovernance is IDAOGovernance {
         address disasterReliefAddress = disasterReliefFactory.deployDisasterRelief(
             proposal.disasterName,
             proposal.location,
-            7 days, // donation period
-            7 days, // registration period
-            4 days, // waiting period
-            7 days, // distribution period
+            1 hours, // donation period
+            1 hours, // registration period
+            30 minutes, // waiting period
+            1 days, // distribution period
             proposal.fundsRequested
         );
         uint256 escrowBalance = fundEscrow.getBalance();
         require(escrowBalance >= proposal.fundsRequested, "Insufficient funds in escrow");
 
         //add initial funds to the contract
-        //fundEscrow.allocateFunds(disasterReliefAddress, proposal.fundsRequested);
+        fundEscrow.allocateFunds(disasterReliefAddress, proposal.fundsRequested);
 
         emit ProposalExecuted(proposalId, disasterReliefAddress);
     }

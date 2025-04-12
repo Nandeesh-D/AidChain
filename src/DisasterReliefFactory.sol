@@ -31,7 +31,7 @@ contract DisasterReliefFactory is IDisasterReliefFactory {
     constructor(address _daoGov, address _zkVerifier, address _usdc, address _donorBadge) {
         owner = msg.sender;
         daoGov = IDAOGovernance(_daoGov);
-        zkVerifier = _zkVerifier;
+        //zkVerifier = _zkVerifier;
         USDC = _usdc;
         donorBadge = DisasterDonorBadge(_donorBadge);
     }
@@ -66,9 +66,9 @@ contract DisasterReliefFactory is IDisasterReliefFactory {
         return address(newRelief);
     }
 
-    function setDAOGovernance(address _daoGov) external onlyOwner {
-        daoGov = IDAOGovernance(_daoGov);
-    }
+    // function setDAOGovernance(address _daoGov) external onlyOwner {
+    //     daoGov = IDAOGovernance(_daoGov);
+    // }
 
     function getProposal(uint256 _index) external view returns (address) {
         return disasterReliefContracts[_index];

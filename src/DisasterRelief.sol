@@ -100,9 +100,8 @@ contract DisasterRelief is IDisasterRelief {
     }
 
     function calculateAmountPerVictim() internal {
-        // Calculate this only once when transitioning to Distribution state
         if (amountPerVictim == 0 && totalVictims > 0) {
-            // Ensure we don't distribute more than available funds
+            // ensuring we don't distribute more than available funds
             amountPerVictim = totalFunds / totalVictims;
         }
     }
@@ -112,14 +111,14 @@ contract DisasterRelief is IDisasterRelief {
         require(victims[msg.sender], "Not a registered victim");
         require(!hasWithdrawn[msg.sender], "Already withdrawn");
 
-        // Calculate amount per victim if not already calculated
+        // calculate amount per victim if not already calculated
         calculateAmountPerVictim();
 
-        // Safety check - ensure we have enough funds
+        //  ensure we have enough funds
         uint256 actualBalance = IERC20(USDC).balanceOf(address(this));
         uint256 amount = amountPerVictim;
 
-        // If we somehow don't have enough funds, adjust the amount
+        // if we somehow don't have enough funds, adjust the amount
         if (amount > actualBalance) {
             amount = actualBalance;
         }
@@ -132,8 +131,6 @@ contract DisasterRelief is IDisasterRelief {
         emit FundsDistributed(msg.sender, amount);
     }
 
-    // This function can still be called directly, but now it's also called
-    // automatically via the autoUpdateState modifier
     function updateState() public {
         if (state == ContractState.Donation && block.timestamp >= donationEndTime) {
             state = ContractState.Registration;
@@ -145,7 +142,7 @@ contract DisasterRelief is IDisasterRelief {
         }
         if (state == ContractState.Waiting && block.timestamp >= waitingEndTime) {
             state = ContractState.Distribution;
-            // Calculate the amount per victim when entering distribution state
+            // calculate the amount per victim when entering distribution state
             calculateAmountPerVictim();
             emit StateChanged(state);
         }

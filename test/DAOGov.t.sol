@@ -62,7 +62,6 @@ contract DAOGovTest is Test {
         generalBadge.setAllowedContract(address(fundEscrow));
         disasterBadge.setAllowedContract(address(disasterReliefFactory));
         vm.stopPrank();
-
         // Mint usdc to fundEscrow
         usdc.mint(address(fundEscrow), 100e6);
     }
