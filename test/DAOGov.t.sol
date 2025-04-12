@@ -199,8 +199,9 @@ contract DAOGovTest is Test{
 
         address victim1=makeAddr("victim1");
         vm.prank(victim1);
+        vm.expectRevert();
         IDisasterRelief(proposal1).registerAsVictim("");
-        assertTrue(DisasterRelief(proposal1).victims(victim1));
+        assertFalse(DisasterRelief(proposal1).victims(victim1));
     }
 
     function test_VictimRegistrationSuccess() public{
