@@ -9,6 +9,7 @@ import {DisasterReliefFactory, IDisasterReliefFactory} from "../src/DisasterReli
 import {DisasterRelief, IDisasterRelief} from "../src/DisasterRelief.sol";
 import {DisasterDonorBadge, INFTBadge} from "../src/DisasterDonorBadge.sol";
 import {GeneralDonorBadge, INFTBadge} from "../src/GeneralDonorBadge.sol";
+import "../../src/LocationDetails.sol";
 
 contract DAOGovTest is Test {
     // Create new instances of these contracts in setUp instead of using addresses
@@ -78,12 +79,13 @@ contract DAOGovTest is Test {
     }
 
     modifier ProposalCreated() {
+        LocationDetails.Location memory location =
+            LocationDetails.Location({latitude: "12.3", longitude: "87.9", radius: "3"});
+
         vm.startPrank(member1);
-        uint256 proposalId =
-            daoGovernance.createProposal("Hudud Cyclone", "Chennai", 6 * 24 * 60 * 60, 1000, "cyclone.jpg");
+        uint256 proposalId = daoGovernance.createProposal("Hudud Cyclone", location, 1000, "cyclone.jpg");
         assert(proposalId == 1);
         assert(daoGovernance.getProposal(proposalId).id == 1);
-        assert(daoGovernance.getProposal(proposalId).duration == 6 * 24 * 60 * 60);
         assert(daoGovernance.getProposal(proposalId).fundsRequested == 1000);
         assert(daoGovernance.getProposal(proposalId).proposer == member1);
         vm.stopPrank();
@@ -126,12 +128,12 @@ contract DAOGovTest is Test {
 
     function test_CreateProposal() public {
         test_addMembers();
+        LocationDetails.Location memory location =
+            LocationDetails.Location({latitude: "12.3", longitude: "87.9", radius: "3"});
         vm.startPrank(member1);
-        uint256 proposalId =
-            daoGovernance.createProposal("Hudud Cyclone", "Chennai", 6 * 24 * 60 * 60, 100e6, "cyclone.jpg");
+        uint256 proposalId = daoGovernance.createProposal("Hudud Cyclone", location, 100e6, "cyclone.jpg");
         assert(proposalId == 1);
         assert(daoGovernance.getProposal(proposalId).id == 1);
-        assert(daoGovernance.getProposal(proposalId).duration == 6 * 24 * 60 * 60);
         assert(daoGovernance.getProposal(proposalId).fundsRequested == 100e6);
         assert(daoGovernance.getProposal(proposalId).proposer == member1);
         vm.stopPrank();

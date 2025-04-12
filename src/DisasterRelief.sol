@@ -7,6 +7,7 @@ import {DisasterDonorBadge} from "./DisasterDonorBadge.sol";
 import {IZKVerifier} from "./interfaces/IZKVerifier.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "../../src/LocationDetails.sol";
 
 contract DisasterRelief is IDisasterRelief {
     using SafeERC20 for IERC20;
@@ -15,7 +16,8 @@ contract DisasterRelief is IDisasterRelief {
     address public immutable USDC;
 
     string public disasterName;
-    string public area;
+
+    LocationDetails.Location public location;
     ContractState public state;
 
     uint256 public donationEndTime;
@@ -38,7 +40,7 @@ contract DisasterRelief is IDisasterRelief {
 
     constructor(
         string memory _disasterName,
-        string memory _area,
+        LocationDetails.Location memory _location,
         uint256 _donationPeriod,
         uint256 _registrationPeriod,
         uint256 _waitingPeriod,
@@ -49,7 +51,7 @@ contract DisasterRelief is IDisasterRelief {
         address _usdc
     ) {
         disasterName = _disasterName;
-        area = _area;
+        location = _location;
 
         donationEndTime = block.timestamp + _donationPeriod;
         registrationEndTime = donationEndTime + _registrationPeriod;
@@ -167,5 +169,9 @@ contract DisasterRelief is IDisasterRelief {
 
     function getVictimCount() external view override returns (uint256) {
         return totalVictims;
+    }
+
+    function getLocationDetails() external view override returns (LocationDetails.Location memory) {
+        return location;
     }
 }

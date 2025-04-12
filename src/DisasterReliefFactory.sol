@@ -8,6 +8,7 @@ import {DisasterDonorBadge} from "./DisasterDonorBadge.sol";
 import {IFundEscrow} from "./interfaces/IFundEscrow.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "../../src/LocationDetails.sol";
 
 contract DisasterReliefFactory is IDisasterReliefFactory {
     using SafeERC20 for IERC20;
@@ -37,7 +38,7 @@ contract DisasterReliefFactory is IDisasterReliefFactory {
 
     function deployDisasterRelief(
         string memory disasterName,
-        string memory area,
+        LocationDetails.Location memory area,
         uint256 donationPeriod,
         uint256 registrationPeriod,
         uint256 waitingPeriod,

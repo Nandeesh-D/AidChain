@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 import {IDAOGovernance} from "./interfaces/IDAOGovernance.sol";
 import {IDisasterReliefFactory} from "./interfaces/IDisasterReliefFactory.sol";
 import {IFundEscrow} from "./interfaces/IFundEscrow.sol";
+import "../../src/LocationDetails.sol";
 
 contract DAOGovernance is IDAOGovernance {
     mapping(address => bool) public isAdmin;
@@ -67,8 +68,7 @@ contract DAOGovernance is IDAOGovernance {
 
     function createProposal(
         string memory disasterName,
-        string memory area,
-        uint256 duration,
+        LocationDetails.Location memory area,
         uint256 fundAmount,
         string memory image
     ) external override onlyDAOMember returns (uint256) {
@@ -78,8 +78,7 @@ contract DAOGovernance is IDAOGovernance {
             id: proposalId,
             proposer: msg.sender,
             disasterName: disasterName,
-            area: area,
-            duration: duration,
+            location: area,
             fundsRequested: fundAmount,
             forVotes: 0,
             againstVotes: 0,
@@ -89,7 +88,7 @@ contract DAOGovernance is IDAOGovernance {
             state: ProposalState.Active
         });
 
-        emit ProposalCreated(proposalId, disasterName, area, duration, fundAmount);
+        emit ProposalCreated(proposalId, disasterName, area, fundAmount);
         return proposalId;
     }
 
@@ -123,7 +122,7 @@ contract DAOGovernance is IDAOGovernance {
         // Deploy DisasterRelief contract via factory
         address disasterReliefAddress = disasterReliefFactory.deployDisasterRelief(
             proposal.disasterName,
-            proposal.area,
+            proposal.location,
             7 days, // donation period
             7 days, // registration period
             4 days, // waiting period

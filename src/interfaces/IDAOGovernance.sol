@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "../../src/LocationDetails.sol";
+
 interface IDAOGovernance {
     enum ProposalState {
         Active,
@@ -12,8 +14,7 @@ interface IDAOGovernance {
         uint256 id;
         address proposer;
         string disasterName;
-        string area;
-        uint256 duration;
+        LocationDetails.Location location;
         uint256 fundsRequested;
         uint256 startTime;
         uint256 endTime;
@@ -24,15 +25,14 @@ interface IDAOGovernance {
     }
 
     event ProposalCreated(
-        uint256 indexed proposalId, string disasterName, string area, uint256 duration, uint256 fundAmount
+        uint256 indexed proposalId, string disasterName, LocationDetails.Location location, uint256 fundAmount
     );
     event Voted(uint256 indexed proposalId, address voter, bool support);
     event ProposalExecuted(uint256 indexed proposalId, address disasterReliefAddress);
 
     function createProposal(
         string memory disasterName,
-        string memory area,
-        uint256 duration,
+        LocationDetails.Location memory location,
         uint256 fundsRequested,
         string memory image
     ) external returns (uint256);
