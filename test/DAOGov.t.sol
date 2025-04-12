@@ -150,7 +150,7 @@ contract DAOGovTest is Test{
         assert(proposalId == 1);
         assert(daoGovernance.getProposal(proposalId).id == 1);
         assert(daoGovernance.getProposal(proposalId).duration == 6 * 24 * 60 * 60);
-        assert(daoGovernance.getProposal(proposalId).fundsRequested == 1000);
+        assert(daoGovernance.getProposal(proposalId).fundsRequested == 100e6);
         assert(daoGovernance.getProposal(proposalId).proposer == member1);
         vm.stopPrank();
     }
