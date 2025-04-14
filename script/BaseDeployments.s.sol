@@ -22,7 +22,7 @@ contract BaseDeployments is Script{
     IDisasterReliefFactory disasterReliefFactory;
     IFundEscrow fundEscrow;
 
-    address admin=0x073C5802eB1f53C0e649F6e4f80AD44f418dd32A;
+    address admin=0xcf744968135c87b91278C0Fe7a38b2459dac9733;
 
     function run() external{
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
@@ -33,12 +33,12 @@ contract BaseDeployments is Script{
         disasterBadge = new DisasterDonorBadge();
         console.log("DisasterDonorBadge address", address(disasterBadge));
         //set baseURI to nfts
-        generalBadge.setBaseURI("ipfs://QmXk1v7Z2x5f3g4h5j6k7l8m9n0o1p2q3r4s5t6u7v8w9x/");
-        disasterBadge.setBaseURI("ipfs://QmXk1v7Z2x5f3g4h5j6k7l8m9n0o1p2q3r4s5t6u7v8w9x/");
+        generalBadge.setBaseURI("ipfs://QmaeCzcmok8YQFV2mMrWtVii26284pV9k3TnouhogtsMRp/");
+        disasterBadge.setBaseURI("ipfs://QmQvbWT14YLj8GbFLsnmi92nv4w5vZ2XErTN8reD2kpfuk/");
         
         
         daoGovernance = new DAOGovernance(admin);
-
+        console.log("DAOGovernance address", address(daoGovernance));
         // Deploy disaster relief factory
         disasterReliefFactory = new DisasterReliefFactory(
             address(daoGovernance),
@@ -46,9 +46,11 @@ contract BaseDeployments is Script{
             address(usdc),
             address(disasterBadge)
         );
+        console.log("DisasterReliefFactory address", address(disasterReliefFactory));
 
         // Deploy fundEscrow
         fundEscrow =new FundEscrow(address(disasterReliefFactory), address(generalBadge), address(daoGovernance), address(usdc));
+        console.log("FundEscrow address", address(fundEscrow));
 
         // Set factory and escrow in governance
         daoGovernance.setDisasterReliefFactory(address(disasterReliefFactory));
