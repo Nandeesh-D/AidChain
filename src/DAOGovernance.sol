@@ -9,6 +9,7 @@ import "../../src/LocationDetails.sol";
 contract DAOGovernance is IDAOGovernance {
     mapping(address => bool) public isAdmin;
     mapping(address => bool) public isDAOMember;
+    address[] public daoMembers;
     uint256 public totalMembers; //totalMembers in the DAO
 
     uint256 private _nextProposalId;
@@ -36,6 +37,7 @@ contract DAOGovernance is IDAOGovernance {
         require(admin != address(0), "Admin address cannot be zero");
         isAdmin[admin] = true;
         isDAOMember[admin] = true;
+        daoMembers.push(admin);
         totalMembers = 1;
     }
 
@@ -55,8 +57,10 @@ contract DAOGovernance is IDAOGovernance {
     function addDAOMember(address member) external onlyAdmin {
         if (!isDAOMember[member]) {
             isDAOMember[member] = true;
+            daoMembers.push(member);
             totalMembers++;
         }
+
     }
 
     function removeDAOMember(address member) external onlyAdmin {
