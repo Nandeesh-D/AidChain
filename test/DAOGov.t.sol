@@ -125,6 +125,18 @@ contract DAOGovTest is Test {
         vm.stopPrank();
     }
 
+    function test_membersArray() public {
+        vm.startPrank(admin);
+        daoGovernance.addDAOMember(member1);
+        daoGovernance.addDAOMember(member2);
+        daoGovernance.addDAOMember(member3);
+        daoGovernance.addDAOMember(member4);
+        daoGovernance.addDAOMember(member5);
+        vm.stopPrank();
+        address[] memory members = daoGovernance.getDAOMembers();
+        assertEq(members[0], admin, "First member should be member1");
+    }
+
     function test_CreateProposal() public {
         test_addMembers();
         LocationDetails.Location memory location =
@@ -138,11 +150,41 @@ contract DAOGovTest is Test {
         vm.stopPrank();
     }
 
+    function test_getPropLen() public {
+        vm.startBroadcast();
+        address[] memory arr = DisasterReliefFactory(0x6F2dA9b816F80811A4dA21e511cb6235167a33Af).getAllProposals();
+        console.log("len of proposals", arr.length);
+        vm.stopBroadcast();
+    }
+
     function test_VoteSuccess() public MembersAdded ProposalCreated {
         vm.startPrank(member2);
         daoGovernance.vote(1, true);
         assert(daoGovernance.getProposal(1).forVotes == 1);
         assert(daoGovernance.hasVoted(1, member2) == true);
+        vm.stopPrank();
+    }
+
+    function test_addDaoMembers() public {
+        vm.startPrank(admin);
+        daoGovernance.addDAOMember(member1);
+        vm.expectRevert();
+        daoGovernance.addDAOMember(member1);
+        vm.stopPrank();
+    }
+
+    function test_deleteDaoMember() public {
+        vm.startPrank(admin);
+        daoGovernance.addDAOMember(member1);
+        daoGovernance.addDAOMember(member2);
+        daoGovernance.addDAOMember(member3);
+        daoGovernance.addDAOMember(member4);
+        assert(daoGovernance.memberCount() == 5);
+        daoGovernance.removeDAOMember(member3);
+
+        assert(daoGovernance.isDAOMember(member3) == false);
+        assert(daoGovernance.memberCount() == 4);
+
         vm.stopPrank();
     }
 
@@ -213,5 +255,92 @@ contract DAOGovTest is Test {
         vm.prank(victim1);
         IDisasterRelief(proposal1).withdrawFunds();
         assertTrue(DisasterRelief(proposal1).hasWithdrawn(victim1));
+    }
+
+    modifier members3() {
+        //now dao has 3 members
+        vm.startPrank(admin);
+        daoGovernance.addDAOMember(member1);
+        daoGovernance.addDAOMember(member2);
+        vm.stopPrank();
+        _;
+    }
+
+    // modifier ProposalCreated1() {
+    //     LocationDetails.Location memory location =
+    //         LocationDetails.Location({latitude: "12.3", longitude: "87.9", radius: "3"});
+
+    //     vm.startPrank(member1);
+    //     uint256 proposalId = daoGovernance.createProposal("Hudud Cyclone", location, 1000, "cyclone.jpg");
+    //     assert(proposalId == 1);
+    //     assert(daoGovernance.getProposal(proposalId).id == 1);
+    //     assert(daoGovernance.getProposal(proposalId).fundsRequested == 1000);
+    //     assert(daoGovernance.getProposal(proposalId).proposer == member1);
+    //     vm.stopPrank();
+    //     _;
+    // }
+
+    // function test_isProposalPassed() public members3() ProposalCreated(){
+    //     vm.prank(member1);
+    //     daoGovernance.vote(1, true);
+    //     console.log("For votes",daoGovernance.getProposal(1).forVotes);
+    //     console.log("Proposal status",uint256(daoGovernance.getProposal(1).state));
+    //     vm.prank(member2);
+    //     daoGovernance.vote(1, true);
+    //     console.log("For votes",daoGovernance.getProposal(1).forVotes);
+    //     console.log("Proposal status",uint256(daoGovernance.getProposal(1).state));
+    //     address[] memory contracts_=DisasterReliefFactory(address(disasterReliefFactory)).getAllProposals();
+    //     assertTrue(contracts_.length ==1);
+    // }
+
+    function test_isProposalPassed1() public members3 ProposalCreated {
+        vm.prank(member1);
+        daoGovernance.vote(1, true);
+        console.log("For votes", daoGovernance.getProposal(1).forVotes);
+        console.log("Proposal status", uint256(daoGovernance.getProposal(1).state));
+        vm.prank(member2);
+        daoGovernance.vote(1, true);
+        console.log("For votes", daoGovernance.getProposal(1).forVotes);
+        console.log("Proposal status", uint256(daoGovernance.getProposal(1).state));
+        // vm.prank(admin);
+        // daoGovernance.vote(1, true);
+        // console.log("For votes",daoGovernance.getProposal(1).forVotes);
+        // console.log("Proposal status",uint256(daoGovernance.getProposal(1).state));
+        // console.log("total member",daoGovernance.memberCount());
+        //assertTrue(uint256(daoGovernance.getProposal(1).state)==0);
+        assertTrue(uint256(daoGovernance.getProposal(1).state) == 1);
+        //address[] memory contracts_=DisasterReliefFactory(address(disasterReliefFactory)).getAllProposals();
+        //assertTrue(contracts_.length ==1);
+    }
+
+    function test_executeProposal1() public members3 ProposalCreated {
+        vm.prank(member1);
+        daoGovernance.vote(1, true);
+        console.log("For votes", daoGovernance.getProposal(1).forVotes);
+        console.log("Proposal status", uint256(daoGovernance.getProposal(1).state));
+        vm.prank(member2);
+        daoGovernance.vote(1, true);
+        console.log("For votes", daoGovernance.getProposal(1).forVotes);
+        console.log("Proposal status", uint256(daoGovernance.getProposal(1).state));
+        vm.prank(admin);
+        daoGovernance.executeProposal(1);
+        assertTrue(DisasterReliefFactory(address(disasterReliefFactory)).getAllProposals().length == 1);
+    }
+
+    function test_env() public {
+        DAOGovernance daoGovernance1 = new DAOGovernance(0x4f29fac9891892e0D1f6B9FBE3b0148CF575F2bb);
+        assertTrue(uint256(daoGovernance1.getProposalStatus(1)) == 1);
+
+        vm.prank(0xcf744968135c87b91278C0Fe7a38b2459dac9733);
+        daoGovernance1.executeProposal(1);
+        assertTrue(DisasterReliefFactory(address(disasterReliefFactory)).getAllProposals().length == 1);
+    }
+
+    function test_proposalFactLen() public {
+        vm.startBroadcast();
+        address[] memory arr = DisasterReliefFactory(0x6F2dA9b816F80811A4dA21e511cb6235167a33Af).getAllProposals();
+        console.log("len of proposals", arr.length);
+        console.log("address of proposal", arr[0]);
+        vm.stopBroadcast();
     }
 }

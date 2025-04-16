@@ -47,3 +47,10 @@ Flow:
 1. Get usdc address 
 2. Deploy NFTS first and setAllowedContract(address disasterReliefFactory) for Disaster,setAllowedContract(Escrow) for general
 3 deploy Govenrnance contract  and setDisasterReliefFactory,setFundEscrow
+
+
+
+
+Note: 
+
+admin and operator must be different in daoGoernance

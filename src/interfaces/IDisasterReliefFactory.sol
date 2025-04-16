@@ -7,7 +7,9 @@ interface IDisasterReliefFactory {
     event DisasterReliefDeployed(address disasterReliefAddress, string disasterName, uint256 initialFunds);
 
     function deployDisasterRelief(
+        uint256 disasterId,
         string memory disasterName,
+        string memory image,
         LocationDetails.Location memory location,
         uint256 donationPeriod,
         uint256 registrationPeriod,

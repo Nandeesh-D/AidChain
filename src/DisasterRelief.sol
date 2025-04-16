@@ -15,8 +15,9 @@ contract DisasterRelief is IDisasterRelief {
     // Base Sepolia USDC address (testnet)
     address public immutable USDC;
 
+    uint256 disasterId;
     string public disasterName;
-
+    string public disasterImage;
     LocationDetails.Location public location;
     ContractState public state;
 
@@ -39,7 +40,9 @@ contract DisasterRelief is IDisasterRelief {
     mapping(address => bool) public hasWithdrawn;
 
     constructor(
+        uint256 _disasterId,
         string memory _disasterName,
+        string memory _disasterImage,
         LocationDetails.Location memory _location,
         uint256 _donationPeriod,
         uint256 _registrationPeriod,
@@ -50,7 +53,9 @@ contract DisasterRelief is IDisasterRelief {
         address _zkVerifier,
         address _usdc
     ) {
+        disasterId = _disasterId;
         disasterName = _disasterName;
+        disasterImage = _disasterImage;
         location = _location;
 
         donationEndTime = block.timestamp + _donationPeriod;
@@ -168,7 +173,25 @@ contract DisasterRelief is IDisasterRelief {
         return totalVictims;
     }
 
+    function getDistributedFunds() external view returns (uint256) {
+        return distributedFunds;
+    }
+
     function getLocationDetails() external view override returns (LocationDetails.Location memory) {
         return location;
+    }
+
+    function getCampaginDetails() external view override returns (DisasterDetails memory) {
+        DisasterDetails memory details = DisasterDetails({
+            disasterId: disasterId,
+            disasterName: disasterName,
+            image: disasterImage,
+            location: location,
+            totalFunds: totalFunds,
+            totalDonors: totalDonors,
+            totalVictimsRegistered: totalVictims,
+            state: state
+        });
+        return details;
     }
 }

@@ -12,6 +12,17 @@ interface IDisasterRelief {
         Closed
     }
 
+    struct DisasterDetails {
+        uint256 disasterId;
+        string disasterName;
+        string image;
+        LocationDetails.Location location;
+        uint256 totalFunds;
+        uint256 totalDonors;
+        uint256 totalVictimsRegistered;
+        ContractState state;
+    }
+
     event DonationReceived(address indexed donor, uint256 amount);
     event VictimRegistered(address indexed victim);
     event FundsDistributed(address indexed victim, uint256 amount);
@@ -25,4 +36,5 @@ interface IDisasterRelief {
     function getDonorCount() external view returns (uint256);
     function getVictimCount() external view returns (uint256);
     function getLocationDetails() external view returns (LocationDetails.Location memory);
+    function getCampaginDetails() external view returns (DisasterDetails memory);
 }

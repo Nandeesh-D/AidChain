@@ -42,7 +42,8 @@ interface IDAOGovernance {
     function getProposal(uint256 proposalId) external view returns (Proposal memory);
 
     function hasVoted(uint256 proposalId, address voter) external view returns (bool);
-
+    function executeProposal(uint256 proposalId) external;
+    function isProposalPassed(uint256 proposalId) external view returns (bool);
     //added extra
     function setDisasterReliefFactory(address factory) external;
 
@@ -57,4 +58,6 @@ interface IDAOGovernance {
     function proposalCount() external view returns (uint256);
 
     function memberCount() external view returns (uint256);
+
+    function getDAOMembers() external view returns (address[] memory);
 }

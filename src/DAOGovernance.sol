@@ -22,9 +22,16 @@ contract DAOGovernance is IDAOGovernance {
     IDisasterReliefFactory public disasterReliefFactory;
     IFundEscrow public fundEscrow;
 
+    address public operator;
+
     // modifiers
     modifier onlyAdmin() {
         require(isAdmin[msg.sender], "Not an admin");
+        _;
+    }
+
+    modifier onlyOperator() {
+        require(msg.sender == operator, "Only operator can do this action");
         _;
     }
 
@@ -39,6 +46,7 @@ contract DAOGovernance is IDAOGovernance {
         isDAOMember[admin] = true;
         daoMembers.push(admin);
         totalMembers = 1;
+        operator = admin;
     }
 
     function setDisasterReliefFactory(address factory) external onlyAdmin {
@@ -59,14 +67,18 @@ contract DAOGovernance is IDAOGovernance {
             isDAOMember[member] = true;
             daoMembers.push(member);
             totalMembers++;
+        } else {
+            revert("Member already exists");
         }
-
     }
 
     function removeDAOMember(address member) external onlyAdmin {
-        if (isDAOMember[member]) {
+        if (isDAOMember[member] && member != msg.sender) {
             isDAOMember[member] = false;
+            deleteDAOMember(member);
             totalMembers--;
+        } else {
+            revert("Member already removed");
         }
     }
 
@@ -107,8 +119,8 @@ contract DAOGovernance is IDAOGovernance {
         if (support) {
             proposal.forVotes++;
 
-            if (isProposalPassed(proposalId)) {
-                executeProposal(proposalId);
+            if (checkProposalPassed(proposalId)) {
+                proposal.state = ProposalState.Passed;
             }
         } else {
             proposal.againstVotes++;
@@ -117,15 +129,15 @@ contract DAOGovernance is IDAOGovernance {
         emit Voted(proposalId, msg.sender, support);
     }
 
-    function executeProposal(uint256 proposalId) internal {
+    function executeProposal(uint256 proposalId) external onlyOperator {
         Proposal storage proposal = _proposals[proposalId];
-        require(proposal.state == ProposalState.Active, "Proposal does not exist");
-
-        proposal.state = ProposalState.Passed;
+        require(proposal.state == ProposalState.Passed, "Proposal does not exist");
 
         // Deploy DisasterRelief contract via factory
         address disasterReliefAddress = disasterReliefFactory.deployDisasterRelief(
+            proposal.id,
             proposal.disasterName,
+            proposal.image,
             proposal.location,
             1 hours, // donation period
             1 hours, // registration period
@@ -142,7 +154,7 @@ contract DAOGovernance is IDAOGovernance {
         emit ProposalExecuted(proposalId, disasterReliefAddress);
     }
 
-    function isProposalPassed(uint256 proposalId) internal view returns (bool) {
+    function checkProposalPassed(uint256 proposalId) internal view returns (bool) {
         Proposal memory proposal = _proposals[proposalId];
         require(proposal.state == ProposalState.Active, "Proposal is Not Active");
         // check the for Vote count is satisfied
@@ -156,8 +168,25 @@ contract DAOGovernance is IDAOGovernance {
         return false;
     }
 
+    function isProposalPassed(uint256 proposalId) external view override returns (bool) {
+        return checkProposalPassed(proposalId);
+    }
+
     function calculateRequiredVotes() internal view returns (uint256 votes) {
         return (60 * totalMembers + 99) / 100;
+    }
+
+    function deleteDAOMember(address member) internal {
+        uint256 index = 0;
+        for (uint256 i = 0; i < daoMembers.length; i++) {
+            if (daoMembers[i] == member) {
+                index = i;
+                break;
+            }
+        }
+        //swap logic
+        daoMembers[index] = daoMembers[daoMembers.length - 1];
+        daoMembers.pop();
     }
 
     function hasVoted(uint256 proposalId, address voter) external view returns (bool) {
@@ -181,5 +210,9 @@ contract DAOGovernance is IDAOGovernance {
 
     function getProposalStatus(uint256 proposalId) external view returns (ProposalState) {
         return _proposals[proposalId].state;
+    }
+
+    function getDAOMembers() external view override returns (address[] memory) {
+        return daoMembers;
     }
 }

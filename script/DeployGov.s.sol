@@ -12,7 +12,7 @@ import {DisasterDonorBadge, INFTBadge} from "../src/DisasterDonorBadge.sol";
 import {GeneralDonorBadge, INFTBadge} from "../src/GeneralDonorBadge.sol";
 import "../../src/LocationDetails.sol";
 
-contract BaseDeployments is Script {
+contract DeployGov is Script {
     IERC20 public usdc = IERC20(0x036CbD53842c5426634e7929541eC2318f3dCF7e); //usdc address on base sepolia
     GeneralDonorBadge public generalBadge;
     DisasterDonorBadge public disasterBadge;
@@ -52,10 +52,10 @@ contract BaseDeployments is Script {
         console.log("FundEscrow address", address(fundEscrow));
 
         // Set factory and escrow in governance
-        daoGovernance.setDisasterReliefFactory(address(disasterReliefFactory));
-        daoGovernance.setFundEscrow(address(fundEscrow));
+        daoGovernance.setDisasterReliefFactory(0x6F2dA9b816F80811A4dA21e511cb6235167a33Af);
+        daoGovernance.setFundEscrow(0xE9FEfb23Ae5382390c54697EFD9E9d4AC3Cf1bdF);
 
-        //set allowed contracts in badges to mint NFTs
+        // //set allowed contracts in badges to mint NFTs
         generalBadge.setAllowedContract(address(fundEscrow));
         disasterBadge.setAllowedContract(address(disasterReliefFactory));
 

@@ -37,7 +37,9 @@ contract DisasterReliefFactory is IDisasterReliefFactory {
     }
 
     function deployDisasterRelief(
+        uint256 disasterId,
         string memory disasterName,
+        string memory image,
         LocationDetails.Location memory area,
         uint256 donationPeriod,
         uint256 registrationPeriod,
@@ -45,10 +47,12 @@ contract DisasterReliefFactory is IDisasterReliefFactory {
         uint256 distributionPeriod,
         uint256 initialFunds
     ) external override returns (address) {
-        require(msg.sender == address(daoGov), "Only fund escrow can deploy");
+        require(msg.sender == address(daoGov), "Only DAOGov can deploy");
 
         DisasterRelief newRelief = new DisasterRelief(
+            disasterId,
             disasterName,
+            image,
             area,
             donationPeriod,
             registrationPeriod,
