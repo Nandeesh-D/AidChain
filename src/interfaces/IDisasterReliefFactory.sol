@@ -19,4 +19,6 @@ interface IDisasterReliefFactory {
     ) external returns (address);
 
     function isDisasterRelief(address disasterReliefAddress) external view returns (bool);
+
+    function setZKVerifier(address _zkVerifier) external
 }
