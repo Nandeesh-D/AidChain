@@ -139,9 +139,9 @@ contract DAOGovernance is IDAOGovernance {
             proposal.disasterName,
             proposal.image,
             proposal.location,
-            1 hours, // donation period
-            1 hours, // registration period
-            30 minutes, // waiting period
+            15 minutes, // donation period
+            10 minutes, // registration period
+            2 minutes, // waiting period
             1 days, // distribution period
             proposal.fundsRequested
         );

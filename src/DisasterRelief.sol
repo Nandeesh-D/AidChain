@@ -4,8 +4,8 @@ pragma solidity ^0.8.20;
 import {IDisasterRelief} from "./interfaces/IDisasterRelief.sol";
 import {IFundEscrow} from "./interfaces/IFundEscrow.sol";
 import {DisasterDonorBadge} from "./DisasterDonorBadge.sol";
-import {IAnonAadhaar} from '@anon-aadhaar/contracts/interfaces/IAnonAadhaar.sol';
-import{IZKVerifier} from "./interfaces/IZKVerifier.sol";
+import {IAnonAadhaar} from "@anon-aadhaar/contracts/interfaces/IAnonAadhaar.sol";
+import {IZKVerifier} from "./interfaces/IZKVerifier.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "../../src/LocationDetails.sol";
@@ -39,7 +39,7 @@ contract DisasterRelief is IDisasterRelief {
     mapping(address => bool) public donors;
     mapping(address => bool) public victims;
     mapping(address => bool) public hasWithdrawn;
-    
+
     constructor(
         uint256 _disasterId,
         string memory _disasterName,
@@ -94,13 +94,23 @@ contract DisasterRelief is IDisasterRelief {
         emit DonationReceived(msg.sender, amount);
     }
 
-    function registerAsVictim(uint256 nullifierSeed,uint256 nullifier,uint256 timestamp,uint256[4] memory dataToReveal,uint256[8] memory groth16Proof) external override autoUpdateState {
-
+    function registerAsVictim(
+        uint256 nullifierSeed,
+        uint256 nullifier,
+        uint256 timestamp,
+        uint256[4] memory dataToReveal,
+        uint256[8] memory groth16Proof
+    ) external override autoUpdateState {
         require(state == ContractState.Registration, "Registrations Not started");
         require(!victims[msg.sender], "Already registered");
-        require(IAnonAadhaar(zkVerifier).verifyAnonAadhaarProof(nullifierSeed,nullifier,timestamp,disasterId,dataToReveal,groth16Proof), "Invalid proof");
+        require(
+            IAnonAadhaar(zkVerifier).verifyAnonAadhaarProof(
+                nullifierSeed, nullifier, timestamp, disasterId, dataToReveal, groth16Proof
+            ),
+            "Invalid proof"
+        );
         //set the state in zkVerifier
-        IZKVerifier(zkVerifier).registerNullifier(nullifier,disasterId);
+        IZKVerifier(zkVerifier).registerNullifier(nullifier, disasterId);
         victims[msg.sender] = true;
         totalVictims++;
 

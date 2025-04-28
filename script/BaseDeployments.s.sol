@@ -10,7 +10,7 @@ import {DisasterReliefFactory, IDisasterReliefFactory} from "../src/DisasterReli
 import {DisasterRelief, IDisasterRelief} from "../src/DisasterRelief.sol";
 import {DisasterDonorBadge, INFTBadge} from "../src/DisasterDonorBadge.sol";
 import {GeneralDonorBadge, INFTBadge} from "../src/GeneralDonorBadge.sol";
-import{ZKVerifier} from "../src/ZKVerifier.sol";
+import {ZKVerifier} from "../src/ZKVerifier.sol";
 import "../../src/LocationDetails.sol";
 
 contract BaseDeployments is Script {
@@ -22,8 +22,8 @@ contract BaseDeployments is Script {
     IDisasterReliefFactory disasterReliefFactory;
     IFundEscrow fundEscrow;
 
-    address admin = 0xcf744968135c87b91278C0Fe7a38b2459dac9733;
-    
+    address admin = 0x1761a60a7E4DC1445B7b727906CF49156708d069;
+
     function run() external {
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
         //deploy nft badge contracts
@@ -35,9 +35,9 @@ contract BaseDeployments is Script {
         //set baseURI to nfts
         generalBadge.setBaseURI("ipfs://QmaeCzcmok8YQFV2mMrWtVii26284pV9k3TnouhogtsMRp/");
         disasterBadge.setBaseURI("ipfs://QmQvbWT14YLj8GbFLsnmi92nv4w5vZ2XErTN8reD2kpfuk/");
-        
+
         //deploy zk verifier contract
-        ZKVerifier zkverifier=new ZKVerifier();
+        ZKVerifier zkverifier = new ZKVerifier();
 
         daoGovernance = new DAOGovernance(admin);
         console.log("DAOGovernance address", address(daoGovernance));
@@ -53,7 +53,6 @@ contract BaseDeployments is Script {
         //set zkverifier address in disaster relief
         disasterReliefFactory.setZKVerifier(address(zkverifier));
 
-        
         // Deploy fundEscrow
         fundEscrow =
             new FundEscrow(address(disasterReliefFactory), address(generalBadge), address(daoGovernance), address(usdc));

@@ -29,7 +29,13 @@ interface IDisasterRelief {
     event StateChanged(ContractState newState);
 
     function donate(uint256 amount) external;
-    function registerAsVictim(uint256 nullifierSeed,uint256 nullifier,uint256 timestamp,uint256[4] memory dataToReveal,uint256[8] memory groth16Proof) external;
+    function registerAsVictim(
+        uint256 nullifierSeed,
+        uint256 nullifier,
+        uint256 timestamp,
+        uint256[4] memory dataToReveal,
+        uint256[8] memory groth16Proof
+    ) external;
     function withdrawFunds() external;
     function getState() external view returns (ContractState);
     function getTotalFunds() external view returns (uint256);
