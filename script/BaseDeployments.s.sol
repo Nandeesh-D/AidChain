@@ -22,7 +22,7 @@ contract BaseDeployments is Script {
     IDisasterReliefFactory disasterReliefFactory;
     IFundEscrow fundEscrow;
 
-    address admin = 0x1761a60a7E4DC1445B7b727906CF49156708d069;
+    address admin = 0xD087160A240C7FA9545680BdCb93939D760BAd12;
 
     function run() external {
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
