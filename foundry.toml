@@ -12,5 +12,5 @@ remappings=[
     "@anon-aadhaar/=lib/anon-aadhaar/packages/"
 ]
 
-eth_rpc_url = "https://base-sepolia.g.alchemy.com/v2/phKZlw4nyzHsPKHrOIx-jfaHvvl4zFPS"
+eth_rpc_url = "${ETH_RPC_URL}"
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
